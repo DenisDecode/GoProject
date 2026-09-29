@@ -1,0 +1,58 @@
+{{define "content"}}
+<div class="flex-container">
+    <!-- Форма добавления трат -->
+    <div class="card form-card">
+        <h2>Добавить расход</h2>
+        <form method="POST" action="/">
+            <div class="form-group">
+                <label for="amount">Сумма (руб):</label>
+                <input type="number" id="amount" name="amount" step="0.01" required placeholder="Например: 500">
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Описание:</label>
+                <input type="text" id="description" name="description" required placeholder="Например: Обед в кафе">
+            </div>
+            
+            <div class="form-group">
+                <label for="date">Дата:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            
+            <button type="submit" class="btn">Добавить</button>
+        </form>
+    </div>
+
+    <!-- Таблица списка трат -->
+    <div class="card list-card">
+        <h2>Список расходов</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Описание</th>
+                    <th>Сумма</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .}}
+                <tr>
+                    <td>{{.Date.Format "02.01.2006"}}</td>
+                    <td>{{.Description}}</td>
+                    <td class="amount-cell">{{.Amount}} ₽</td>
+                </tr>
+                {{else}}
+                <tr>
+                    <td colspan="3" class="text-center">Трат пока нет. Добавьте первую!</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Автоматически подставляем сегодняшнюю дату в инпут для удобства
+    document.getElementById('date').valueAsDate = new Date();
+</script>
+{{end}}

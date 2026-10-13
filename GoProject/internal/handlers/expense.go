@@ -1,73 +1,99 @@
 package handlers
 
 import (
+	"GoProject/internal/repository"
 	"html/template"
-	"my-server/internal/models"
+	"log"
 	"net/http"
 	"strconv"
-	"time"
 )
 
-// Хранилище в памяти (взамен базы данных на этом этапе)
-var Expenses []models.Expense
+type Handler struct {
+	repo *repository.Repository
+	tmpl *template.Template
+}
 
-// Инициализируем несколькими тестовыми записями для наглядности
-func init() {
-	Expenses = []models.Expense{
-		{Amount: 1500.0, Description: "Продукты", Date: time.Now().AddDate(0, 0, -1)},
-		{Amount: 450.0, Description: "Кофе и десерт", Date: time.Now()},
+func NewHandler(repo *repository.Repository, tmpl *template.Template) *Handler {
+	return &Handler{repo: repo, tmpl: tmpl}
+}
+
+func (h *Handler) ExpensesHandler(w http.ResponseWriter, r *http.Request) {
+	// 1. Читаем параметры фильтрации из URL (Этап 4)
+	categoryID := r.URL.Query().Get("category")
+	dateFrom := r.URL.Query().Get("from")
+	dateTo := r.URL.Query().Get("to")
+
+	// 2. Получаем данные из базы через репозиторий (вместо памяти)
+	expenses, err := h.repo.GetFilteredExpenses(categoryID, dateFrom, dateTo)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	categories, err := h.repo.GetAllCategories()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// 3. Передаем данные в шаблон
+	data := map[string]interface{}{
+		"Expenses":   expenses,
+		"Categories": categories,
+		"SelCat":     categoryID,
+		"DateFrom":   dateFrom,
+		"DateTo":     dateTo,
+	}
+
+	// ИЗМЕНЕНИЕ: проверяем ошибку выполнения шаблона
+	err = h.tmpl.ExecuteTemplate(w, "layout", data)
+	if err != nil {
+		log.Printf("Ошибка отрисовки шаблона: %v", err)
+		http.Error(w, "Ошибка сервера при отрисовке страницы", http.StatusInternalServerError)
+		return
 	}
 }
 
-// ExpenseHandler управляет отображением и добавлением трат
-func ExpenseHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		// 1. Разбираем данные формы
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, "Ошибка разбора формы", http.StatusBadRequest)
-			return
-		}
-
-		amountStr := r.FormValue("amount")
-		description := r.FormValue("description")
-		dateStr := r.FormValue("date")
-
-		// 2. Валидация и конвертация данных
-		amount, err := strconv.ParseFloat(amountStr, 64)
-		if err != nil {
-			http.Error(w, "Некорректная сумма", http.StatusBadRequest)
-			return
-		}
-
-		date, err := time.Parse("2006-01-02", dateStr)
-		if err != nil {
-			date = time.Now() // если дата не указана, берем текущую
-		}
-
-		// 3. Сохраняем в наш срез в памяти
-		newExpense := models.Expense{
-			Amount:      amount,
-			Description: description,
-			Date:        date,
-		}
-		Expenses = append(Expenses, newExpense)
-
-		// 4. Паттерн Post/Redirect/Get (PRG) — защищает от повторной отправки формы
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+// AddExpenseHandler обрабатывает POST-запрос от формы добавления расхода
+func (h *Handler) AddExpenseHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
 		return
 	}
 
-	// Если метод GET — рендерим страницу со списком трат
-	// Парсим базовый шаблон (layout) и контентную страницу
-	tmpl, err := template.ParseFiles("web/templates/layout.html", "web/templates/index.html")
-	if err != nil {
-		http.Error(w, "Ошибка компиляции шаблонов: "+err.Error(), http.StatusInternalServerError)
+	// 1. Парсим данные формы из HTML
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Ошибка разбора формы", http.StatusBadRequest)
 		return
 	}
 
-	// Передаем срез трат в шаблон
-	err = tmpl.ExecuteTemplate(w, "layout", Expenses)
+	// 2. Получаем значения по их name из index.html
+	amountStr := r.FormValue("amount")
+	description := r.FormValue("description")
+	date := r.FormValue("date")
+	categoryIDStr := r.FormValue("category_id")
+
+	// 3. Конвертируем строку суммы в float64
+	amount, err := strconv.ParseFloat(amountStr, 64)
 	if err != nil {
-		http.Error(w, "Ошибка рендеринга шаблона", http.StatusInternalServerError)
+		http.Error(w, "Некорректная сумма", http.StatusBadRequest)
+		return
 	}
+
+	// 4. Конвертируем ID категории в int
+	categoryID, err := strconv.Atoi(categoryIDStr)
+	if err != nil {
+		http.Error(w, "Некорректная категория", http.StatusBadRequest)
+		return
+	}
+
+	// 5. Вызываем готовый метод репозитория для сохранения в БД
+	err = h.repo.CreateExpense(amount, description, date, categoryID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// 6. Перенаправляем пользователя обратно на страницу со списком
+	http.Redirect(w, r, "/expenses", http.StatusSeeOther)
 }

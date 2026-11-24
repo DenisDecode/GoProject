@@ -1,0 +1,24 @@
+{{define "title"}}Вход{{end}}
+
+{{define "content"}}
+<div class="card form-card">
+    <h1>Вход</h1>
+    {{with .Form.Errors.form}}<div class="alert alert-error">{{.}}</div>{{end}}
+    <form method="POST" action="/login" novalidate>
+        <div class="field {{if .Form.Errors.email}}has-error{{end}}">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{.Form.Email}}" autocomplete="email" autofocus>
+            {{with .Form.Errors.email}}<p class="field-error">{{.}}</p>{{end}}
+        </div>
+        <div class="field {{if .Form.Errors.password}}has-error{{end}}">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" autocomplete="current-password">
+            {{with .Form.Errors.password}}<p class="field-error">{{.}}</p>{{end}}
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Войти</button>
+        </div>
+    </form>
+    <p class="muted">Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+</div>
+{{end}}

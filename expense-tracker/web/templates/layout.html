@@ -1,0 +1,42 @@
+{{define "layout"}}<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{block "title" .}}Учёт трат{{end}} — Учёт личных трат</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="logo" href="/">💰 Учёт трат</a>
+        <nav class="nav">
+            {{if .User}}
+                <a href="/expenses" {{if eq .CurrentPath "/expenses"}}class="active"{{end}}>Траты</a>
+                <a href="/expenses/new" {{if eq .CurrentPath "/expenses/new"}}class="active"{{end}}>Добавить</a>
+                <a href="/stats" {{if eq .CurrentPath "/stats"}}class="active"{{end}}>Статистика</a>
+                <a href="/about" {{if eq .CurrentPath "/about"}}class="active"{{end}}>О проекте</a>
+                <span class="nav-user">{{.User.Email}}</span>
+                <form method="POST" action="/logout" class="inline">
+                    <button type="submit" class="link-button">Выйти</button>
+                </form>
+            {{else}}
+                <a href="/about" {{if eq .CurrentPath "/about"}}class="active"{{end}}>О проекте</a>
+                <a href="/login" {{if eq .CurrentPath "/login"}}class="active"{{end}}>Вход</a>
+                <a href="/register" {{if eq .CurrentPath "/register"}}class="active"{{end}}>Регистрация</a>
+            {{end}}
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    {{template "content" .}}
+</main>
+
+<footer class="site-footer">
+    <div class="container">© {{.CurrentYear}} «Учёт личных трат» — учебный проект на Go</div>
+</footer>
+{{block "scripts" .}}{{end}}
+</body>
+</html>
+{{end}}

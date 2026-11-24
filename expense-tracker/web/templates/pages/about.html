@@ -1,0 +1,18 @@
+{{define "title"}}О проекте{{end}}
+
+{{define "content"}}
+<div class="card">
+    <h1>О проекте</h1>
+    <p>«Учёт личных трат» — учебное веб-приложение на Go. Пользователь регистрируется,
+       добавляет расходы с категориями, фильтрует их и смотрит статистику.</p>
+    <h2>Технологии</h2>
+    <ul>
+        <li>HTTP-сервер — стандартный пакет <code>net/http</code> (маршрутизатор <code>http.ServeMux</code>, Go 1.22+);</li>
+        <li>шаблоны — <code>html/template</code> (автоматическое экранирование, защита от XSS);</li>
+        <li>база данных — SQLite через <code>database/sql</code> (драйвер <code>modernc.org/sqlite</code>);</li>
+        <li>авторизация — сессии в cookie, пароли хэшируются через <code>bcrypt</code>;</li>
+        <li>графики — Chart.js + <code>fetch()</code> к JSON API.</li>
+    </ul>
+    <p>Служебный маршрут для проверки: <a href="/ping">/ping</a> (отвечает <code>pong</code>).</p>
+</div>
+{{end}}

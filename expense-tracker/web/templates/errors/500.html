@@ -1,0 +1,15 @@
+{{define "title"}}Ошибка{{end}}
+
+{{define "content"}}
+<div class="error-page">
+    <p class="error-code">{{.Status}}</p>
+    {{if eq .Status 500}}
+        <h1>Внутренняя ошибка сервера</h1>
+        <p class="muted">Что-то пошло не так. Мы уже записали ошибку в лог — попробуйте позже.</p>
+    {{else}}
+        <h1>{{.StatusText}}</h1>
+        <p class="muted">Запрос не может быть обработан.</p>
+    {{end}}
+    <div class="actions"><a class="btn btn-primary" href="/">На главную</a></div>
+</div>
+{{end}}

@@ -1,0 +1,13 @@
+{{define "title"}}Страница не найдена{{end}}
+
+{{define "content"}}
+<div class="error-page">
+    <p class="error-code">404</p>
+    <h1>Страница не найдена</h1>
+    <p class="muted">Такой страницы нет или у вас нет к ней доступа.</p>
+    <div class="actions">
+        <a class="btn btn-primary" href="/">На главную</a>
+        {{if .User}}<a class="btn" href="/expenses">К списку трат</a>{{end}}
+    </div>
+</div>
+{{end}}

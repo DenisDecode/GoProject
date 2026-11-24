@@ -1,0 +1,39 @@
+{{define "title"}}Статистика{{end}}
+
+{{define "content"}}
+<h1>Статистика расходов</h1>
+
+<div class="stats-grid">
+    <section class="card">
+        <h2>По категориям</h2>
+        <div class="filters-inline">
+            <label>С <input type="date" id="cat-from"></label>
+            <label>По <input type="date" id="cat-to"></label>
+            <button type="button" class="btn btn-small btn-primary" id="cat-apply">Показать</button>
+        </div>
+        <p class="muted">Итого: <strong id="cat-total">—</strong></p>
+        <div class="alert alert-error" id="cat-error" hidden></div>
+        <p class="empty" id="cat-empty" hidden>Нет трат за выбранный период.</p>
+        <div class="chart-box"><canvas id="chart-category"></canvas></div>
+    </section>
+
+    <section class="card">
+        <h2>По месяцам</h2>
+        <div class="filters-inline">
+            <label>Год
+                <select id="month-year">
+                    {{range .Years}}<option value="{{.}}">{{.}}</option>{{end}}
+                </select>
+            </label>
+        </div>
+        <p class="muted">Итого за год: <strong id="month-total">—</strong></p>
+        <div class="alert alert-error" id="month-error" hidden></div>
+        <div class="chart-box"><canvas id="chart-month"></canvas></div>
+    </section>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="/static/js/stats.js"></script>
+{{end}}

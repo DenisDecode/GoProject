@@ -1,0 +1,50 @@
+{{define "title"}}{{if .Expense}}Редактирование траты{{else}}Новая трата{{end}}{{end}}
+
+{{define "content"}}
+<div class="card form-card">
+    <h1>{{if .Expense}}Редактирование траты{{else}}Новая трата{{end}}</h1>
+
+    {{if .Form.Errors}}
+        <div class="alert alert-error">Проверьте правильность заполнения формы.</div>
+    {{end}}
+
+    <!-- novalidate: браузер не блокирует отправку, все проверки выполняет сервер -->
+    <form method="POST" action="{{if .Expense}}/expenses/{{.Expense.ID}}/edit{{else}}/expenses{{end}}" novalidate>
+        <div class="field {{if .Form.Errors.amount}}has-error{{end}}">
+            <label for="amount">Сумма, ₽</label>
+            <input type="text" inputmode="decimal" id="amount" name="amount"
+                   value="{{.Form.Amount}}" placeholder="Например, 350 или 199,90" autofocus>
+            {{with .Form.Errors.amount}}<p class="field-error">{{.}}</p>{{end}}
+        </div>
+
+        <div class="field {{if .Form.Errors.description}}has-error{{end}}">
+            <label for="description">Описание</label>
+            <input type="text" id="description" name="description" maxlength="200"
+                   value="{{.Form.Description}}" placeholder="Например, обед в кафе">
+            {{with .Form.Errors.description}}<p class="field-error">{{.}}</p>{{end}}
+        </div>
+
+        <div class="field {{if .Form.Errors.date}}has-error{{end}}">
+            <label for="date">Дата</label>
+            <input type="date" id="date" name="date" value="{{.Form.Date}}">
+            {{with .Form.Errors.date}}<p class="field-error">{{.}}</p>{{end}}
+        </div>
+
+        <div class="field {{if .Form.Errors.category}}has-error{{end}}">
+            <label for="category_id">Категория</label>
+            <select id="category_id" name="category_id">
+                <option value="">— выберите категорию —</option>
+                {{range .Categories}}
+                    <option value="{{.ID}}" {{if eq (printf "%d" .ID) $.Form.CategoryID}}selected{{end}}>{{.Name}}</option>
+                {{end}}
+            </select>
+            {{with .Form.Errors.category}}<p class="field-error">{{.}}</p>{{end}}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{{if .Expense}}Сохранить{{else}}Добавить{{end}}</button>
+            <a class="btn" href="/expenses">Отмена</a>
+        </div>
+    </form>
+</div>
+{{end}}

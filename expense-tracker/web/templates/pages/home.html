@@ -1,0 +1,28 @@
+{{define "title"}}Главная{{end}}
+
+{{define "content"}}
+<section class="hero">
+    <h1>Добро пожаловать в «Учёт личных трат»!</h1>
+    <p class="lead">Записывайте расходы, распределяйте их по категориям и смотрите, куда уходят деньги.</p>
+    {{if .User}}
+        <p>Вы вошли как <strong>{{.User.Email}}</strong>.</p>
+        <div class="actions">
+            <a class="btn btn-primary" href="/expenses/new">+ Добавить трату</a>
+            <a class="btn" href="/expenses">Мои траты</a>
+            <a class="btn" href="/stats">Статистика</a>
+        </div>
+    {{else}}
+        <div class="actions">
+            <a class="btn btn-primary" href="/register">Зарегистрироваться</a>
+            <a class="btn" href="/login">Войти</a>
+        </div>
+    {{end}}
+</section>
+
+<section class="features">
+    <div class="card"><h3>📝 Учёт</h3><p>Добавляйте, редактируйте и удаляйте траты.</p></div>
+    <div class="card"><h3>🏷️ Категории</h3><p>Фильтруйте траты по категориям и датам.</p></div>
+    <div class="card"><h3>📊 Статистика</h3><p>Графики по категориям и месяцам.</p></div>
+    <div class="card"><h3>🔒 Приватность</h3><p>Каждый пользователь видит только свои траты.</p></div>
+</section>
+{{end}}

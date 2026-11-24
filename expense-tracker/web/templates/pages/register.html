@@ -1,0 +1,28 @@
+{{define "title"}}Регистрация{{end}}
+
+{{define "content"}}
+<div class="card form-card">
+    <h1>Регистрация</h1>
+    <form method="POST" action="/register" novalidate>
+        <div class="field {{if .Form.Errors.email}}has-error{{end}}">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{.Form.Email}}" autocomplete="email" autofocus>
+            {{with .Form.Errors.email}}<p class="field-error">{{.}}</p>{{end}}
+        </div>
+        <div class="field {{if .Form.Errors.password}}has-error{{end}}">
+            <label for="password">Пароль (не менее 8 символов)</label>
+            <input type="password" id="password" name="password" autocomplete="new-password">
+            {{with .Form.Errors.password}}<p class="field-error">{{.}}</p>{{end}}
+        </div>
+        <div class="field {{if .Form.Errors.password_confirm}}has-error{{end}}">
+            <label for="password_confirm">Повторите пароль</label>
+            <input type="password" id="password_confirm" name="password_confirm" autocomplete="new-password">
+            {{with .Form.Errors.password_confirm}}<p class="field-error">{{.}}</p>{{end}}
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+        </div>
+    </form>
+    <p class="muted">Уже есть аккаунт? <a href="/login">Войти</a></p>
+</div>
+{{end}}
